@@ -14,7 +14,6 @@
     -webkit-user-select: none; user-select: none;
     -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
   }
-
   .title-bar {
     text-align: center; padding: 6px 20px 2px; width: 100%; flex-shrink: 0;
   }
@@ -30,52 +29,45 @@
     padding: 6px 18px; gap: 8px; min-height: 0;
   }
 
-  /* ===== 选手池（横向）===== */
-  .pool-row {
-    display: flex; align-items: center; gap: 12px; flex-shrink: 0;
-  }
+  /* ===== 选手池（横向双行）===== */
+  .pool-row { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
   .pool-label {
-    font-size: 0.85rem; color: rgba(255,255,255,0.4); white-space: nowrap; letter-spacing: 2px;
+    font-size: 0.78rem; color: rgba(255,255,255,0.45); white-space: nowrap; letter-spacing: 1px;
+    width: 90px; flex-shrink: 0;
   }
-  .pool-players {
-    display: flex; gap: 16px; flex: 1; justify-content: center;
-  }
+  .pool-players { display: flex; gap: 14px; flex: 1; justify-content: center; }
   .pool-player {
-    display: flex; align-items: center; gap: 12px;
-    padding: 10px 22px; min-height: 52px; border-radius: 12px;
+    display: flex; align-items: center; gap: 10px;
+    padding: 8px 18px; min-height: 48px; border-radius: 10px;
     cursor: pointer; background: rgba(255,255,255,0.06);
     border: 2.5px solid transparent; transition: border-color 0.12s, background 0.12s;
   }
   .pool-player:active { background: rgba(255,255,255,0.14); }
   .pool-player.selected {
-    border-color: #ff6e40; background: rgba(255,110,64,0.2);
-    box-shadow: 0 0 16px rgba(255,110,64,0.3);
+    border-color: #ffab00; background: rgba(255,171,0,0.18);
+    box-shadow: 0 0 14px rgba(255,171,0,0.3);
   }
   .pool-player.used { opacity: 0.15; pointer-events: none; }
-  .pool-player .pp-emoji { font-size: 2.2rem; flex-shrink: 0; }
-  .pool-player .pp-name { font-weight: bold; font-size: 0.9rem; }
-  .pool-player .pp-score { font-size: 0.85rem; font-weight: bold; color: rgba(255,255,255,0.85); }
+  .pool-player .pp-emoji { font-size: 2rem; flex-shrink: 0; }
+  .pool-player .pp-name { font-weight: bold; font-size: 0.85rem; }
+  .pool-player .pp-score { font-size: 0.78rem; font-weight: bold; color: rgba(255,255,255,0.85); }
   .pool-player .pp-info { display: flex; gap: 8px; align-items: center; }
+
   .tier-fast .pp-name { color: #ff6e40; }
   .tier-mid .pp-name { color: #4fc3f7; }
   .tier-slow .pp-name { color: #66bb6a; }
 
+  .pool-class1 { border-left: 3px solid #4fc3f7; }
+  .pool-class2 { border-left: 3px solid #ff8a65; }
+
   /* ===== 两班对垒 ===== */
-  .battle-row {
-    display: flex; gap: 14px; flex: 1 1 0; min-height: 0;
-  }
+  .battle-row { display: flex; gap: 14px; flex: 1 1 0; min-height: 0; }
   .camp {
     flex: 1; border-radius: 12px; padding: 10px 14px;
     display: flex; flex-direction: column; gap: 6px; min-width: 0; min-height: 0;
   }
-  .camp-class2 {
-    background: rgba(255,110,64,0.08);
-    border: 2px solid rgba(255,110,64,0.3);
-  }
-  .camp-class1 {
-    background: rgba(79,195,247,0.08);
-    border: 2px solid rgba(79,195,247,0.3);
-  }
+  .camp-class2 { background: rgba(255,110,64,0.08); border: 2px solid rgba(255,110,64,0.3); }
+  .camp-class1 { background: rgba(79,195,247,0.08); border: 2px solid rgba(79,195,247,0.3); }
   .camp-header {
     display: flex; align-items: center; gap: 6px; flex-shrink: 0;
     font-size: 0.9rem; font-weight: bold; padding-bottom: 5px;
@@ -84,28 +76,25 @@
   .camp-class2 .camp-header { color: #ff8a65; }
   .camp-class1 .camp-header { color: #4fc3f7; }
 
-  .camp-slots {
-    display: flex; flex-direction: column; gap: 5px; flex: 1; min-height: 0;
-  }
+  .camp-slots { display: flex; flex-direction: column; gap: 5px; flex: 1; min-height: 0; }
 
   .battle-slot {
     display: flex; align-items: center; gap: 8px; padding: 8px 12px;
     border-radius: 10px; flex: 1; min-height: 50px;
     border: 2.5px dashed rgba(255,255,255,0.12);
     background: rgba(255,255,255,0.03);
+    cursor: pointer;
     transition: border-color 0.12s, background 0.12s;
   }
-  .camp-class2 .battle-slot { cursor: pointer; }
-  .camp-class2 .battle-slot:active { background: rgba(255,255,255,0.08); }
-  .camp-class2 .battle-slot.target {
-    border-color: #81c784; background: rgba(129,199,132,0.15);
+  .battle-slot:active { background: rgba(255,255,255,0.08); }
+  .battle-slot.target {
+    border-color: #81c784; background: rgba(129,199,132,0.12);
   }
   .camp-class2 .battle-slot.filled {
     border-style: solid; border-color: #ff8a65; background: rgba(255,138,101,0.1);
   }
-  .camp-class1 .battle-slot {
-    border-style: solid; border-color: rgba(79,195,247,0.2);
-    background: rgba(79,195,247,0.06);
+  .camp-class1 .battle-slot.filled {
+    border-style: solid; border-color: #4fc3f7; background: rgba(79,195,247,0.1);
   }
 
   .battle-slot .bs-round {
@@ -146,8 +135,7 @@
   .battle-arena {
     background: rgba(0,0,0,0.3); border-radius: 12px; padding: 10px 16px;
     flex: 0 1 28%; display: flex; flex-direction: column; overflow: hidden;
-    min-height: 100px;
-    border: 1.5px solid rgba(255,255,255,0.06);
+    min-height: 100px; border: 1.5px solid rgba(255,255,255,0.06);
   }
   .arena-placeholder {
     flex: 1; display: flex; align-items: center; justify-content: center;
@@ -164,8 +152,7 @@
   }
   .arena-half {
     flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-    position: relative; border-right: 2px dashed rgba(255,255,255,0.12);
-    gap: 4px;
+    position: relative; border-right: 2px dashed rgba(255,255,255,0.12); gap: 4px;
   }
   .arena-half:last-child { border-right: none; }
   .half-label {
@@ -191,17 +178,14 @@
   .vs-badge {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
     font-size: 0.75rem; font-weight: bold; color: rgba(255,171,0,0.7);
-    background: rgba(0,0,0,0.5); padding: 3px 8px; border-radius: 10px;
-    z-index: 5;
+    background: rgba(0,0,0,0.5); padding: 3px 8px; border-radius: 10px; z-index: 5;
   }
   .arena-status {
     text-align: center; margin-top: 4px; font-size: 0.85rem; font-weight: bold;
     flex-shrink: 0; min-height: 20px;
   }
 
-  .result-summary {
-    display: none; justify-content: center; gap: 10px; flex-shrink: 0;
-  }
+  .result-summary { display: none; justify-content: center; gap: 10px; flex-shrink: 0; }
   .result-summary.show { display: flex; }
   .result-chip {
     padding: 5px 12px; border-radius: 14px; font-size: 0.8rem; font-weight: bold;
@@ -210,9 +194,7 @@
   .result-chip.lose { background: rgba(244,67,54,0.15); color: #ef5350; border: 1.5px solid #f44336; }
   .result-chip.draw { background: rgba(255,215,0,0.12); color: #ffd700; border: 1.5px solid #ffd700; }
 
-  .btn-row {
-    display: flex; gap: 10px; justify-content: center; flex-shrink: 0; padding-bottom: 4px;
-  }
+  .btn-row { display: flex; gap: 10px; justify-content: center; flex-shrink: 0; padding-bottom: 4px; }
   button {
     padding: 10px 22px; min-height: 48px; border: none; border-radius: 10px;
     font-size: 0.88rem; font-weight: bold; cursor: pointer; transition: transform 0.1s;
@@ -260,25 +242,25 @@
 
 <div class="main-area">
 
-  <!-- 选手池 -->
+  <!-- 选手池：五年二班 -->
   <div class="pool-row">
-    <span class="pool-label">🏫 五年二班队员</span>
-    <div class="pool-players" id="poolPlayers">
-      <div class="pool-player tier-fast" data-tier="fast" data-name="小飞" data-score="175" data-emoji="🏃" onclick="selectPlayer(this)">
+    <span class="pool-label">🟠 五年二班</span>
+    <div class="pool-players">
+      <div class="pool-player pool-class2 tier-fast" data-id="2fast" data-class="2" data-name="小飞" data-score="175" data-emoji="🏃" onclick="selectPlayer(this)">
         <span class="pp-emoji">🏃</span>
         <div class="pp-info">
           <span class="pp-name">小飞</span>
           <span class="pp-score">175个 ⚡⚡⚡</span>
         </div>
       </div>
-      <div class="pool-player tier-mid" data-tier="mid" data-name="小健" data-score="155" data-emoji="🤸" onclick="selectPlayer(this)">
+      <div class="pool-player pool-class2 tier-mid" data-id="2mid" data-class="2" data-name="小健" data-score="155" data-emoji="🤸" onclick="selectPlayer(this)">
         <span class="pp-emoji">🤸</span>
         <div class="pp-info">
           <span class="pp-name">小健</span>
           <span class="pp-score">155个 ⚡⚡</span>
         </div>
       </div>
-      <div class="pool-player tier-slow" data-tier="slow" data-name="小稳" data-score="135" data-emoji="🚶" onclick="selectPlayer(this)">
+      <div class="pool-player pool-class2 tier-slow" data-id="2slow" data-class="2" data-name="小稳" data-score="135" data-emoji="🚶" onclick="selectPlayer(this)">
         <span class="pp-emoji">🚶</span>
         <div class="pp-info">
           <span class="pp-name">小稳</span>
@@ -288,26 +270,54 @@
     </div>
   </div>
 
-  <div class="select-hint" id="selectHint">👆 选一名队员，再点左边的出场位</div>
+  <!-- 选手池：五年一班 -->
+  <div class="pool-row">
+    <span class="pool-label">🔵 五年一班</span>
+    <div class="pool-players">
+      <div class="pool-player pool-class1 tier-fast" data-id="1fast" data-class="1" data-name="大壮" data-score="180" data-emoji="🏃" onclick="selectPlayer(this)">
+        <span class="pp-emoji">🏃</span>
+        <div class="pp-info">
+          <span class="pp-name">大壮</span>
+          <span class="pp-score">180个 ⚡⚡⚡</span>
+        </div>
+      </div>
+      <div class="pool-player pool-class1 tier-mid" data-id="1mid" data-class="1" data-name="大勇" data-score="160" data-emoji="🤸" onclick="selectPlayer(this)">
+        <span class="pp-emoji">🤸</span>
+        <div class="pp-info">
+          <span class="pp-name">大勇</span>
+          <span class="pp-score">160个 ⚡⚡</span>
+        </div>
+      </div>
+      <div class="pool-player pool-class1 tier-slow" data-id="1slow" data-class="1" data-name="大平" data-score="140" data-emoji="🚶" onclick="selectPlayer(this)">
+        <span class="pp-emoji">🚶</span>
+        <div class="pp-info">
+          <span class="pp-name">大平</span>
+          <span class="pp-score">140个 ⚡</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="select-hint" id="selectHint">👆 选一名队员，再点任意出场位</div>
 
   <!-- 对垒 -->
   <div class="battle-row">
     <div class="camp camp-class2">
       <div class="camp-header">🟠 五年二班 · 出场顺序</div>
-      <div class="camp-slots" id="deploySlots">
-        <div class="battle-slot" data-round="0" onclick="placeInSlot(this)">
+      <div class="camp-slots" id="slots2">
+        <div class="battle-slot" data-class="2" data-round="0" onclick="placeInSlot(this)">
           <span class="bs-round">第 1 场</span>
           <span class="bs-empty">＋</span>
           <span class="bs-emoji"></span>
           <span class="bs-name"></span>
         </div>
-        <div class="battle-slot" data-round="1" onclick="placeInSlot(this)">
+        <div class="battle-slot" data-class="2" data-round="1" onclick="placeInSlot(this)">
           <span class="bs-round">第 2 场</span>
           <span class="bs-empty">＋</span>
           <span class="bs-emoji"></span>
           <span class="bs-name"></span>
         </div>
-        <div class="battle-slot" data-round="2" onclick="placeInSlot(this)">
+        <div class="battle-slot" data-class="2" data-round="2" onclick="placeInSlot(this)">
           <span class="bs-round">第 3 场</span>
           <span class="bs-empty">＋</span>
           <span class="bs-emoji"></span>
@@ -324,24 +334,24 @@
 
     <div class="camp camp-class1">
       <div class="camp-header">🔵 五年一班 · 出场顺序</div>
-      <div class="camp-slots">
-        <div class="battle-slot">
+      <div class="camp-slots" id="slots1">
+        <div class="battle-slot" data-class="1" data-round="0" onclick="placeInSlot(this)">
           <span class="bs-round">第 1 场</span>
-          <span class="bs-emoji">🏃</span>
-          <span class="bs-name" style="color:rgba(255,255,255,0.7);">大壮</span>
-          <span class="bs-tag">180个 ⚡⚡⚡</span>
+          <span class="bs-empty">＋</span>
+          <span class="bs-emoji"></span>
+          <span class="bs-name"></span>
         </div>
-        <div class="battle-slot">
+        <div class="battle-slot" data-class="1" data-round="1" onclick="placeInSlot(this)">
           <span class="bs-round">第 2 场</span>
-          <span class="bs-emoji">🤸</span>
-          <span class="bs-name" style="color:rgba(255,255,255,0.7);">大勇</span>
-          <span class="bs-tag">160个 ⚡⚡</span>
+          <span class="bs-empty">＋</span>
+          <span class="bs-emoji"></span>
+          <span class="bs-name"></span>
         </div>
-        <div class="battle-slot">
+        <div class="battle-slot" data-class="1" data-round="2" onclick="placeInSlot(this)">
           <span class="bs-round">第 3 场</span>
-          <span class="bs-emoji">🚶</span>
-          <span class="bs-name" style="color:rgba(255,255,255,0.7);">大平</span>
-          <span class="bs-tag">140个 ⚡</span>
+          <span class="bs-empty">＋</span>
+          <span class="bs-emoji"></span>
+          <span class="bs-name"></span>
         </div>
       </div>
     </div>
@@ -349,14 +359,14 @@
 
   <!-- 比赛区 -->
   <div class="battle-arena" id="battleArena">
-    <div class="arena-placeholder">🏟️ 安排出场顺序，点击「开始比赛」</div>
+    <div class="arena-placeholder">🏟️ 安排两班出场顺序，点击「开始比赛」</div>
   </div>
 
   <div class="result-summary" id="resultSummary"></div>
 
   <div class="btn-row">
     <button class="btn-hint" onclick="showHint()">💡 锦囊</button>
-    <button class="btn-start" id="btnStart" onclick="startBattle()" disabled>⏳ 请先安排出场</button>
+    <button class="btn-start" id="btnStart" onclick="startBattle()" disabled>⏳ 请先安排两班出场</button>
     <button class="btn-reset" onclick="resetAll()">🔄 重来</button>
   </div>
 </div>
@@ -365,127 +375,160 @@
   <div class="hint-card">
     <h3>💡 田忌赛马策略</h3>
     <p>
-      第1场：<b style="color:#66bb6a;">小稳 135</b> vs 大壮 180 → 输（用最弱消耗对手最强）<br>
-      第2场：<b style="color:#ff6e40;">小飞 175</b> vs 大勇 160 → 赢（用最强碾压对手中等）<br>
-      第3场：<b style="color:#4fc3f7;">小健 155</b> vs 大平 140 → 赢（用中等稳吃对手最弱）<br><br>
-      <b style="color:#ffab00;">总体 2:1 反败为胜！</b>
+      如果你是五年二班，可以用「以下对上」：<br>
+      第1场：<b style="color:#66bb6a;">小稳 135</b> vs 大壮 180 → 输<br>
+      第2场：<b style="color:#ff6e40;">小飞 175</b> vs 大勇 160 → 赢<br>
+      第3场：<b style="color:#4fc3f7;">小健 155</b> vs 大平 140 → 赢<br><br>
+      如果你是五年一班，可以用「以中对下」：<br>
+      第1场：<b style="color:#4fc3f7;">大勇 160</b> vs 小飞 175 → 输<br>
+      第2场：<b style="color:#ff6e40;">大壮 180</b> vs 小健 155 → 赢<br>
+      第3场：<b style="color:#66bb6a;">大平 140</b> vs 小稳 135 → 赢<br><br>
+      <b style="color:#ffab00;">灵活调整出场顺序！</b>
     </p>
     <button onclick="closeHint()">知道了</button>
   </div>
 </div>
 
 <script>
-  var slots = [null, null, null];
-  var selectedTier = null;
-
-  var opponentOrder = [
-    { tier: 'fast', name: '大壮', score: 180, emoji: '🏃' },
-    { tier: 'mid',  name: '大勇', score: 160, emoji: '🤸' },
-    { tier: 'slow', name: '大平', score: 140, emoji: '🚶' }
-  ];
+  // slots2[3] = 五年二班出场, slots1[3] = 五年一班出场
+  var slots = [[null, null, null], [null, null, null]];
+  var selectedId = null;
 
   function selectPlayer(el) {
     if (el.classList.contains('used')) return;
-    var tier = el.dataset.tier;
+    var id = el.dataset.id;
+
+    // deselect all
     document.querySelectorAll('.pool-player.selected').forEach(function(h) { h.classList.remove('selected'); });
     document.querySelectorAll('.battle-slot.target').forEach(function(s) { s.classList.remove('target'); });
-    if (selectedTier === tier) {
-      selectedTier = null;
-      document.getElementById('selectHint').textContent = '👆 选一名队员，再点左边的出场位';
+
+    if (selectedId === id) {
+      selectedId = null;
+      document.getElementById('selectHint').textContent = '👆 选一名队员，再点任意出场位';
       return;
     }
-    selectedTier = tier;
+    selectedId = id;
     el.classList.add('selected');
     document.getElementById('selectHint').textContent = '✅ 已选中「' + el.dataset.name + '（' + el.dataset.score + '个）」点出场位';
-    document.querySelectorAll('#deploySlots .battle-slot').forEach(function(s) {
-      if (!slots[parseInt(s.dataset.round)]) s.classList.add('target');
+
+    // highlight available slots for this player's class
+    var cls = el.dataset.class;
+    document.querySelectorAll('.battle-slot[data-class="' + cls + '"]').forEach(function(s) {
+      var ri = parseInt(s.dataset.round);
+      if (!slots[cls - 1][ri]) s.classList.add('target');
     });
   }
 
   function placeInSlot(el) {
+    var clsIdx = parseInt(el.dataset.class) - 1;
     var ri = parseInt(el.dataset.round);
-    if (slots[ri]) {
-      var data = slots[ri];
-      slots[ri] = null;
+
+    // If slot is filled, withdraw
+    if (slots[clsIdx][ri]) {
+      var data = slots[clsIdx][ri];
+      slots[clsIdx][ri] = null;
       el.classList.remove('filled');
       el.querySelector('.bs-empty').style.display = '';
       el.querySelector('.bs-emoji').style.display = 'none';
       el.querySelector('.bs-emoji').textContent = '';
       el.querySelector('.bs-name').textContent = '';
-      var p = document.querySelector('.pool-player[data-tier="' + data.tier + '"]');
+      var p = document.querySelector('.pool-player[data-id="' + data.id + '"]');
       if (p) p.classList.remove('used');
       document.getElementById('resultSummary').classList.remove('show');
       updateTargets(); checkAllReady();
       return;
     }
-    if (!selectedTier) {
+
+    if (!selectedId) {
       var hint = document.getElementById('selectHint');
       hint.textContent = '🖐️ 请先在队员列表中选一名队员';
-      setTimeout(function() { hint.textContent = '👆 选一名队员，再点左边的出场位'; }, 1500);
+      setTimeout(function() { hint.textContent = '👆 选一名队员，再点任意出场位'; }, 1500);
       return;
     }
-    var player = document.querySelector('.pool-player[data-tier="' + selectedTier + '"]');
+
+    var player = document.querySelector('.pool-player[data-id="' + selectedId + '"]');
     if (!player || player.classList.contains('used')) return;
+
+    // Check class match
+    if (player.dataset.class !== el.dataset.class) {
+      var hint = document.getElementById('selectHint');
+      var clsName = el.dataset.class === '1' ? '五年一班' : '五年二班';
+      hint.textContent = '⚠️ 该队员不属于' + clsName + '，请选对应班级的队员';
+      setTimeout(function() { hint.textContent = '👆 选一名队员，再点任意出场位'; }, 2000);
+      return;
+    }
+
     var data = {
-      tier: player.dataset.tier, name: player.dataset.name,
-      score: parseInt(player.dataset.score), emoji: player.dataset.emoji
+      id: player.dataset.id,
+      class: player.dataset.class,
+      name: player.dataset.name,
+      score: parseInt(player.dataset.score),
+      emoji: player.dataset.emoji
     };
-    slots[ri] = data;
+    slots[clsIdx][ri] = data;
     player.classList.add('used');
     el.classList.add('filled');
     el.querySelector('.bs-empty').style.display = 'none';
     el.querySelector('.bs-emoji').style.display = '';
     el.querySelector('.bs-emoji').textContent = data.emoji;
     el.querySelector('.bs-name').textContent = data.name;
+
     document.querySelectorAll('.pool-player.selected').forEach(function(h) { h.classList.remove('selected'); });
     document.querySelectorAll('.battle-slot.target').forEach(function(s) { s.classList.remove('target'); });
-    selectedTier = null;
+    selectedId = null;
+
+    var allFilled = slots[0].every(function(s) { return s; }) && slots[1].every(function(s) { return s; });
     document.getElementById('selectHint').textContent =
-      slots.every(function(s) { return s; }) ? '✅ 出场顺序已排好，开始比赛！' : '👆 继续安排出场顺序';
+      allFilled ? '✅ 两班出场顺序已排好，开始比赛！' : '👆 继续安排出场顺序';
     updateTargets(); checkAllReady();
   }
 
   function updateTargets() {
-    document.querySelectorAll('#deploySlots .battle-slot').forEach(function(s) {
+    document.querySelectorAll('.battle-slot').forEach(function(s) {
+      var clsIdx = parseInt(s.dataset.class) - 1;
       var ri = parseInt(s.dataset.round);
-      if (!slots[ri] && selectedTier) s.classList.add('target');
-      else s.classList.remove('target');
+      if (!slots[clsIdx][ri] && selectedId) {
+        var player = document.querySelector('.pool-player[data-id="' + selectedId + '"]');
+        if (player && player.dataset.class === s.dataset.class) s.classList.add('target');
+      } else {
+        s.classList.remove('target');
+      }
     });
   }
 
   function checkAllReady() {
-    var all = slots.every(function(s) { return s !== null; });
+    var all = slots[0].every(function(s) { return s; }) && slots[1].every(function(s) { return s; });
     var btn = document.getElementById('btnStart');
     btn.disabled = !all;
-    btn.textContent = all ? '🏁 开始比赛！' : '⏳ 请先安排出场';
+    btn.textContent = all ? '🏁 开始比赛！' : '⏳ 请先安排两班出场';
     if (!all) document.getElementById('resultSummary').classList.remove('show');
   }
 
   // ===== 比赛动画 =====
   function startBattle() {
-    if (!slots.every(function(s) { return s; })) return;
+    if (!slots[0].every(function(s) { return s; }) || !slots[1].every(function(s) { return s; })) return;
     var btn = document.getElementById('btnStart');
     btn.disabled = true; btn.textContent = '🏟️ 比赛中...';
     document.getElementById('resultSummary').classList.remove('show');
 
     var arena = document.getElementById('battleArena');
-    var ourWins = 0, theirWins = 0;
+    var wins2 = 0, wins1 = 0;
     var roundResults = [];
 
-    function buildArena(i, ours, theirs) {
+    function buildArena(i, p2, p1) {
       arena.innerHTML =
-        '<div class="arena-header">🏁 第'+(i+1)+'场 ' + ours.emoji + ' ' + ours.name + ' vs ' + theirs.emoji + ' ' + theirs.name + '</div>'+
+        '<div class="arena-header">🏁 第'+(i+1)+'场 ' + p2.emoji + ' ' + p2.name + ' vs ' + p1.emoji + ' ' + p1.name + '</div>'+
         '<div class="arena-floor">'+
           '<div class="arena-half">'+
-            '<span class="half-label us">二年·' + ours.name + '</span>'+
-            '<div class="jumper" id="jmpUs'+i+'">' + ours.emoji + '</div>'+
-            '<div class="score-display us" id="scrUs'+i+'">0</div>'+
+            '<span class="half-label us">二班·' + p2.name + '</span>'+
+            '<div class="jumper" id="jmp2'+i+'">' + p2.emoji + '</div>'+
+            '<div class="score-display us" id="scr2'+i+'">0</div>'+
           '</div>'+
           '<div class="vs-badge">VS</div>'+
           '<div class="arena-half">'+
-            '<span class="half-label them">一班·' + theirs.name + '</span>'+
-            '<div class="jumper" id="jmpThem'+i+'">' + theirs.emoji + '</div>'+
-            '<div class="score-display them" id="scrThem'+i+'">0</div>'+
+            '<span class="half-label them">一班·' + p1.name + '</span>'+
+            '<div class="jumper" id="jmp1'+i+'">' + p1.emoji + '</div>'+
+            '<div class="score-display them" id="scr1'+i+'">0</div>'+
           '</div>'+
         '</div>'+
         '<div class="arena-status" id="as'+i+'">3...</div>';
@@ -493,22 +536,19 @@
 
     function runRound(i) {
       return new Promise(function(resolve) {
-        var ours = slots[i], theirs = opponentOrder[i];
-        buildArena(i, ours, theirs);
+        var p2 = slots[0][i], p1 = slots[1][i];
+        buildArena(i, p2, p1);
 
-        var scrUs = document.getElementById('scrUs'+i);
-        var scrThem = document.getElementById('scrThem'+i);
-        var jmpUs = document.getElementById('jmpUs'+i);
-        var jmpThem = document.getElementById('jmpThem'+i);
+        var scr2 = document.getElementById('scr2'+i);
+        var scr1 = document.getElementById('scr1'+i);
+        var jmp2 = document.getElementById('jmp2'+i);
+        var jmp1 = document.getElementById('jmp1'+i);
         var st = document.getElementById('as'+i);
 
-        var usStep = ours.score / 90;
-        var themStep = theirs.score / 90;
-
-        var usFinal = ours.score;
-        var themFinal = theirs.score;
-        var isDraw = (usFinal === themFinal);
-        var ourWin = !isDraw && usFinal > themFinal;
+        var step2 = p2.score / 90;
+        var step1 = p1.score / 90;
+        var isDraw = (p2.score === p1.score);
+        var class2Win = !isDraw && p2.score > p1.score;
 
         var cd = 3;
         var cdTimer = setInterval(function() {
@@ -517,43 +557,41 @@
           else {
             st.textContent = '🪢 开始！'; st.style.color = '#ff8a65';
             clearInterval(cdTimer);
-            jmpUs.classList.add('bouncing'); jmpThem.classList.add('bouncing');
+            jmp2.classList.add('bouncing'); jmp1.classList.add('bouncing');
             countUp();
           }
         }, 700);
 
-        var usCur = 0, themCur = 0;
+        var cur2 = 0, cur1 = 0;
         function countUp() {
           var t = setInterval(function() {
-            // Calculate target for this frame
-            usCur = Math.min(usCur + usStep, usFinal);
-            themCur = Math.min(themCur + themStep, themFinal);
+            cur2 = Math.min(cur2 + step2, p2.score);
+            cur1 = Math.min(cur1 + step1, p1.score);
+            scr2.textContent = Math.floor(cur2);
+            scr1.textContent = Math.floor(cur1);
 
-            scrUs.textContent = Math.floor(usCur);
-            scrThem.textContent = Math.floor(themCur);
-
-            if (usCur >= usFinal && themCur >= themFinal) {
+            if (cur2 >= p2.score && cur1 >= p1.score) {
               clearInterval(t);
-              jmpUs.classList.remove('bouncing'); jmpThem.classList.remove('bouncing');
-              scrUs.textContent = usFinal;
-              scrThem.textContent = themFinal;
+              jmp2.classList.remove('bouncing'); jmp1.classList.remove('bouncing');
+              scr2.textContent = p2.score;
+              scr1.textContent = p1.score;
 
               if (isDraw) {
-                st.innerHTML = '🟡 <b style="color:#ffd700;">平局！ ' + usFinal + ':' + themFinal + '</b>';
-              } else if (ourWin) {
-                st.innerHTML = '🟢 <b style="color:#ff8a65;">五年二班胜！ ' + usFinal + ':' + themFinal + '</b>';
-                ourWins++;
-                jmpUs.style.fontSize = '3.6rem';
+                st.innerHTML = '🟡 <b style=\"color:#ffd700;\">平局！ ' + p2.score + ':' + p1.score + '</b>';
+              } else if (class2Win) {
+                st.innerHTML = '🟢 <b style=\"color:#ff8a65;\">五年二班胜！ ' + p2.score + ':' + p1.score + '</b>';
+                wins2++;
+                jmp2.style.fontSize = '3.6rem';
               } else {
-                st.innerHTML = '🔵 <b style="color:#4fc3f7;">五年一班胜... ' + usFinal + ':' + themFinal + '</b>';
-                theirWins++;
-                jmpThem.style.fontSize = '3.6rem';
+                st.innerHTML = '🔵 <b style=\"color:#4fc3f7;\">五年一班胜！ ' + p2.score + ':' + p1.score + '</b>';
+                wins1++;
+                jmp1.style.fontSize = '3.6rem';
               }
               roundResults.push({
                 round: i+1,
-                ours: ours.name + '(' + usFinal + ')',
-                theirs: theirs.name + '(' + themFinal + ')',
-                ourWin: ourWin,
+                p2: p2.name + '(' + p2.score + ')',
+                p1: p1.name + '(' + p1.score + ')',
+                class2Win: class2Win,
                 draw: isDraw
               });
               setTimeout(resolve, 700);
@@ -570,20 +608,26 @@
       }
 
       var nn = roundResults.map(function(r) {
-        var cls = r.draw ? 'draw' : (r.ourWin ? 'win' : 'lose');
-        var sym = r.draw ? '🤝' : (r.ourWin ? '✅' : '❌');
-        return '<div class="result-chip '+cls+' fade-in">第'+r.round+'场: '+r.ours+' vs '+r.theirs+' → '+sym+'</div>';
+        var cls = r.draw ? 'draw' : (r.class2Win ? 'win' : 'lose');
+        var sym = r.draw ? '🤝' : (r.class2Win ? '🟢' : '🔵');
+        return '<div class="result-chip '+cls+' fade-in">第'+r.round+'场: '+r.p2+' vs '+r.p1+' → '+sym+'</div>';
       });
-      var finalCls = (ourWins>theirWins) ? 'win' : (ourWins===theirWins ? 'draw' : 'lose');
-      var finalMsg = (ourWins>theirWins) ? '🎉 五年二班 '+ourWins+':'+theirWins+' 获胜！策略成功！' :
-        (ourWins===theirWins ? '🤝 五年二班 '+ourWins+':'+theirWins+' 平局' :
-        '💔 五年二班 '+ourWins+':'+theirWins+' 失败，再想想策略...');
+
+      var finalCls = (wins2>wins1) ? 'win' : (wins2===wins1 ? 'draw' : 'lose');
+      var finalMsg;
+      if (wins2 > wins1) {
+        finalMsg = '🎉 五年二班 ' + wins2 + ':' + wins1 + ' 获胜！🏆';
+      } else if (wins1 > wins2) {
+        finalMsg = '🎉 五年一班 ' + wins2 + ':' + wins1 + ' 获胜！🏆';
+      } else {
+        finalMsg = '🤝 平局！ ' + wins2 + ':' + wins1 + ' 不分胜负';
+      }
+
       arena.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;flex:1;padding:8px;">'+
         nn.join('') + '<div class="result-chip '+finalCls+' fade-in" style="font-size:0.95rem;">'+finalMsg+'</div>'+
         '<div style="color:rgba(255,255,255,0.3);font-size:0.7rem;margin-top:4px;">点击「重来」再战</div></div>';
 
       btn.disabled = false; btn.textContent = '🔄 再来一局'; btn.onclick = resetAll;
-
     }
 
     runAll();
@@ -593,21 +637,24 @@
   function closeHint() { document.getElementById('hintOverlay').classList.remove('show'); }
 
   function resetAll() {
-    slots = [null, null, null]; selectedTier = null;
+    slots = [[null, null, null], [null, null, null]];
+    selectedId = null;
+
     document.querySelectorAll('.pool-player').forEach(function(p) { p.classList.remove('used','selected'); });
-    document.querySelectorAll('#deploySlots .battle-slot').forEach(function(s) {
+    document.querySelectorAll('.battle-slot').forEach(function(s) {
       s.classList.remove('filled','target');
       s.querySelector('.bs-empty').style.display = '';
       s.querySelector('.bs-emoji').style.display = 'none';
       s.querySelector('.bs-emoji').textContent = '';
       s.querySelector('.bs-name').textContent = '';
     });
+
     document.getElementById('battleArena').innerHTML =
-      '<div class="arena-placeholder">🏟️ 安排出场顺序，点击「开始比赛」</div>';
+      '<div class="arena-placeholder">🏟️ 安排两班出场顺序，点击「开始比赛」</div>';
     document.getElementById('resultSummary').classList.remove('show');
-    document.getElementById('selectHint').textContent = '👆 选一名队员，再点左边的出场位';
+    document.getElementById('selectHint').textContent = '👆 选一名队员，再点任意出场位';
     var btn = document.getElementById('btnStart');
-    btn.disabled = true; btn.textContent = '⏳ 请先安排出场'; btn.onclick = startBattle;
+    btn.disabled = true; btn.textContent = '⏳ 请先安排两班出场'; btn.onclick = startBattle;
     closeHint();
   }
 </script>
