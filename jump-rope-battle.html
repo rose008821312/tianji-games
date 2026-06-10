@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>一分钟跳绳比赛 - 五年二班 VS 五年一班</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+    background: linear-gradient(180deg, #0a1628 0%, #1a2a4a 30%, #2a3a5a 60%, #1a2a4a 100%);
+    color: #fff; display: flex; flex-direction: column; align-items: center;
+    -webkit-user-select: none; user-select: none;
+    -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
+  }
+
+  .title-bar {
+    text-align: center; padding: 6px 20px 2px; width: 100%; flex-shrink: 0;
+  }
+  .title-bar h1 {
+    font-size: 1.5rem; letter-spacing: 3px; margin: 0;
+    background: linear-gradient(90deg, #ff6e40, #ffab00, #ff6e40);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .main-area {
+    flex: 1; width: 100%; max-width: 1100px; display: flex; flex-direction: column;
+    padding: 6px 18px; gap: 8px; min-height: 0;
+  }
+
+  /* ===== 选手池（横向）===== */
+  .pool-row {
+    display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+  }
+  .pool-label {
+    font-size: 0.85rem; color: rgba(255,255,255,0.4); white-space: nowrap; letter-spacing: 2px;
+  }
+  .pool-players {
+    display: flex; gap: 16px; flex: 1; justify-content: center;
+  }
+  .pool-player {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 22px; min-height: 52px; border-radius: 12px;
+    cursor: pointer; background: rgba(255,255,255,0.06);
+    border: 2.5px solid transparent; transition: border-color 0.12s, background 0.12s;
+  }
+  .pool-player:active { background: rgba(255,255,255,0.14); }
+  .pool-player.selected {
+    border-color: #ff6e40; background: rgba(255,110,64,0.2);
+    box-shadow: 0 0 16px rgba(255,110,64,0.3);
+  }
+  .pool-player.used { opacity: 0.15; pointer-events: none; }
+  .pool-player .pp-emoji { font-size: 2.2rem; flex-shrink: 0; }
+  .pool-player .pp-name { font-weight: bold; font-size: 0.9rem; }
+  .pool-player .pp-score { font-size: 0.85rem; font-weight: bold; color: rgba(255,255,255,0.85); }
+  .pool-player .pp-info { display: flex; gap: 8px; align-items: center; }
+  .tier-fast .pp-name { color: #ff6e40; }
+  .tier-mid .pp-name { color: #4fc3f7; }
+  .tier-slow .pp-name { color: #66bb6a; }
+
+  /* ===== 两班对垒 ===== */
+  .battle-row {
+    display: flex; gap: 14px; flex: 1 1 0; min-height: 0;
+  }
+  .camp {
+    flex: 1; border-radius: 12px; padding: 10px 14px;
+    display: flex; flex-direction: column; gap: 6px; min-width: 0; min-height: 0;
+  }
+  .camp-class2 {
+    background: rgba(255,110,64,0.08);
+    border: 2px solid rgba(255,110,64,0.3);
+  }
+  .camp-class1 {
+    background: rgba(79,195,247,0.08);
+    border: 2px solid rgba(79,195,247,0.3);
+  }
+  .camp-header {
+    display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+    font-size: 0.9rem; font-weight: bold; padding-bottom: 5px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .camp-class2 .camp-header { color: #ff8a65; }
+  .camp-class1 .camp-header { color: #4fc3f7; }
+
+  .camp-slots {
+    display: flex; flex-direction: column; gap: 5px; flex: 1; min-height: 0;
+  }
+
+  .battle-slot {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+    border-radius: 10px; flex: 1; min-height: 50px;
+    border: 2.5px dashed rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.03);
+    transition: border-color 0.12s, background 0.12s;
+  }
+  .camp-class2 .battle-slot { cursor: pointer; }
+  .camp-class2 .battle-slot:active { background: rgba(255,255,255,0.08); }
+  .camp-class2 .battle-slot.target {
+    border-color: #81c784; background: rgba(129,199,132,0.15);
+  }
+  .camp-class2 .battle-slot.filled {
+    border-style: solid; border-color: #ff8a65; background: rgba(255,138,101,0.1);
+  }
+  .camp-class1 .battle-slot {
+    border-style: solid; border-color: rgba(79,195,247,0.2);
+    background: rgba(79,195,247,0.06);
+  }
+
+  .battle-slot .bs-round {
+    font-size: 0.7rem; color: rgba(255,255,255,0.3);
+    width: 40px; flex-shrink: 0; font-weight: bold;
+  }
+  .battle-slot .bs-emoji {
+    font-size: 1.8rem; flex-shrink: 0; width: 38px; text-align: center;
+  }
+  .battle-slot .bs-empty {
+    font-size: 1.5rem; color: rgba(255,255,255,0.08);
+    width: 38px; text-align: center; flex-shrink: 0;
+  }
+  .battle-slot .bs-name {
+    font-size: 0.88rem; font-weight: bold; min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .battle-slot .bs-tag {
+    font-size: 0.82rem; font-weight: bold; color: rgba(255,255,255,0.8); flex-shrink: 0; margin-left: auto;
+  }
+
+  .vs-col {
+    display: flex; flex-direction: column; gap: 5px; justify-content: center;
+    align-items: center; flex-shrink: 0; width: 36px; padding-top: 28px;
+  }
+  .vs-col span {
+    flex: 1; display: flex; align-items: center;
+    font-size: 0.8rem; font-weight: bold;
+    color: rgba(255,171,0,0.3); min-height: 50px;
+  }
+
+  .select-hint {
+    text-align: center; color: rgba(255,255,255,0.35); font-size: 0.7rem;
+    flex-shrink: 0; min-height: 1.2em;
+  }
+
+  /* ===== 比赛区 ===== */
+  .battle-arena {
+    background: rgba(0,0,0,0.3); border-radius: 12px; padding: 10px 16px;
+    flex: 0 1 28%; display: flex; flex-direction: column; overflow: hidden;
+    min-height: 100px;
+    border: 1.5px solid rgba(255,255,255,0.06);
+  }
+  .arena-placeholder {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.18); font-size: 0.9rem;
+  }
+  .arena-header {
+    text-align: center; font-size: 0.9rem; color: #ffab00;
+    font-weight: bold; margin-bottom: 6px; flex-shrink: 0;
+  }
+  .arena-floor {
+    width: 100%; flex: 1; background: linear-gradient(180deg, #3a2a1a 0%, #5a4a3a 50%, #3a2a1a 100%);
+    border-radius: 8px; position: relative; overflow: hidden;
+    border: 3px solid #5d4037; display: flex;
+  }
+  .arena-half {
+    flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+    position: relative; border-right: 2px dashed rgba(255,255,255,0.12);
+    gap: 4px;
+  }
+  .arena-half:last-child { border-right: none; }
+  .half-label {
+    font-size: 0.65rem; font-weight: bold; padding: 2px 8px; border-radius: 4px;
+    position: absolute; top: 4px;
+  }
+  .half-label.us { background: rgba(255,110,64,0.5); color: #fff; left: 6px; }
+  .half-label.them { background: rgba(79,195,247,0.5); color: #000; right: 6px; }
+  .jumper {
+    font-size: 2.8rem; line-height: 1;
+    transition: transform 0.15s;
+  }
+  .jumper.bouncing { animation: bounce 0.25s ease-in-out infinite; }
+  @keyframes bounce {
+    0%,100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-12px) scale(1.08); }
+  }
+  .score-display {
+    font-size: 1.8rem; font-weight: bold; font-family: 'Consolas','Courier New',monospace;
+  }
+  .score-display.us { color: #ff8a65; }
+  .score-display.them { color: #4fc3f7; }
+  .vs-badge {
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    font-size: 0.75rem; font-weight: bold; color: rgba(255,171,0,0.7);
+    background: rgba(0,0,0,0.5); padding: 3px 8px; border-radius: 10px;
+    z-index: 5;
+  }
+  .arena-status {
+    text-align: center; margin-top: 4px; font-size: 0.85rem; font-weight: bold;
+    flex-shrink: 0; min-height: 20px;
+  }
+
+  .result-summary {
+    display: none; justify-content: center; gap: 10px; flex-shrink: 0;
+  }
+  .result-summary.show { display: flex; }
+  .result-chip {
+    padding: 5px 12px; border-radius: 14px; font-size: 0.8rem; font-weight: bold;
+  }
+  .result-chip.win { background: rgba(76,175,80,0.18); color: #66bb6a; border: 1.5px solid #4caf50; }
+  .result-chip.lose { background: rgba(244,67,54,0.15); color: #ef5350; border: 1.5px solid #f44336; }
+  .result-chip.draw { background: rgba(255,215,0,0.12); color: #ffd700; border: 1.5px solid #ffd700; }
+
+  .btn-row {
+    display: flex; gap: 10px; justify-content: center; flex-shrink: 0; padding-bottom: 4px;
+  }
+  button {
+    padding: 10px 22px; min-height: 48px; border: none; border-radius: 10px;
+    font-size: 0.88rem; font-weight: bold; cursor: pointer; transition: transform 0.1s;
+    font-family: inherit; letter-spacing: 1px;
+  }
+  button:active { transform: scale(0.95); }
+  .btn-start {
+    background: linear-gradient(135deg, #ff6e40, #ffab00);
+    color: #fff; font-size: 0.95rem; padding: 12px 32px;
+  }
+  .btn-start:active:not(:disabled) { box-shadow: 0 4px 16px rgba(255,110,64,0.5); }
+  .btn-start:disabled { opacity: 0.25; cursor: not-allowed; }
+  .btn-reset { background: rgba(255,255,255,0.1); color: #ccc; font-size: 0.85rem; }
+  .btn-reset:active { background: rgba(255,255,255,0.2); }
+  .btn-hint { background: rgba(255,171,0,0.12); color: #ffab00; font-size: 0.85rem; }
+  .btn-hint:active { background: rgba(255,171,0,0.22); }
+
+  .hint-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); z-index: 100;
+    justify-content: center; align-items: center;
+  }
+  .hint-overlay.show { display: flex; }
+  .hint-card {
+    background: #0a1628; border: 2.5px solid #ffab00; border-radius: 18px;
+    padding: 28px; text-align: center; max-width: 420px; margin: 24px;
+  }
+  .hint-card h3 { color: #ffab00; margin-bottom: 14px; font-size: 1.2rem; }
+  .hint-card p { color: #ccc; line-height: 1.8; font-size: 0.95rem; }
+  .hint-card button {
+    margin-top: 16px; background: #ffab00; color: #000; padding: 10px 30px;
+    min-height: 44px; font-size: 1rem;
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in { animation: fadeInUp 0.4s ease-out; }
+</style>
+</head>
+<body>
+
+<div class="title-bar"><h1>🥇 一分钟跳绳比赛</h1></div>
+
+<div class="main-area">
+
+  <!-- 选手池 -->
+  <div class="pool-row">
+    <span class="pool-label">🏫 五年二班队员</span>
+    <div class="pool-players" id="poolPlayers">
+      <div class="pool-player tier-fast" data-tier="fast" data-name="小飞" data-score="175" data-emoji="🏃" onclick="selectPlayer(this)">
+        <span class="pp-emoji">🏃</span>
+        <div class="pp-info">
+          <span class="pp-name">小飞</span>
+          <span class="pp-score">175个 ⚡⚡⚡</span>
+        </div>
+      </div>
+      <div class="pool-player tier-mid" data-tier="mid" data-name="小健" data-score="155" data-emoji="🤸" onclick="selectPlayer(this)">
+        <span class="pp-emoji">🤸</span>
+        <div class="pp-info">
+          <span class="pp-name">小健</span>
+          <span class="pp-score">155个 ⚡⚡</span>
+        </div>
+      </div>
+      <div class="pool-player tier-slow" data-tier="slow" data-name="小稳" data-score="135" data-emoji="🚶" onclick="selectPlayer(this)">
+        <span class="pp-emoji">🚶</span>
+        <div class="pp-info">
+          <span class="pp-name">小稳</span>
+          <span class="pp-score">135个 ⚡</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="select-hint" id="selectHint">👆 选一名队员，再点左边的出场位</div>
+
+  <!-- 对垒 -->
+  <div class="battle-row">
+    <div class="camp camp-class2">
+      <div class="camp-header">🟠 五年二班 · 出场顺序</div>
+      <div class="camp-slots" id="deploySlots">
+        <div class="battle-slot" data-round="0" onclick="placeInSlot(this)">
+          <span class="bs-round">第 1 场</span>
+          <span class="bs-empty">＋</span>
+          <span class="bs-emoji"></span>
+          <span class="bs-name"></span>
+        </div>
+        <div class="battle-slot" data-round="1" onclick="placeInSlot(this)">
+          <span class="bs-round">第 2 场</span>
+          <span class="bs-empty">＋</span>
+          <span class="bs-emoji"></span>
+          <span class="bs-name"></span>
+        </div>
+        <div class="battle-slot" data-round="2" onclick="placeInSlot(this)">
+          <span class="bs-round">第 3 场</span>
+          <span class="bs-empty">＋</span>
+          <span class="bs-emoji"></span>
+          <span class="bs-name"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="vs-col">
+      <span>⚔️</span>
+      <span>⚔️</span>
+      <span>⚔️</span>
+    </div>
+
+    <div class="camp camp-class1">
+      <div class="camp-header">🔵 五年一班 · 出场顺序</div>
+      <div class="camp-slots">
+        <div class="battle-slot">
+          <span class="bs-round">第 1 场</span>
+          <span class="bs-emoji">🏃</span>
+          <span class="bs-name" style="color:rgba(255,255,255,0.7);">大壮</span>
+          <span class="bs-tag">180个 ⚡⚡⚡</span>
+        </div>
+        <div class="battle-slot">
+          <span class="bs-round">第 2 场</span>
+          <span class="bs-emoji">🤸</span>
+          <span class="bs-name" style="color:rgba(255,255,255,0.7);">大勇</span>
+          <span class="bs-tag">160个 ⚡⚡</span>
+        </div>
+        <div class="battle-slot">
+          <span class="bs-round">第 3 场</span>
+          <span class="bs-emoji">🚶</span>
+          <span class="bs-name" style="color:rgba(255,255,255,0.7);">大平</span>
+          <span class="bs-tag">140个 ⚡</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 比赛区 -->
+  <div class="battle-arena" id="battleArena">
+    <div class="arena-placeholder">🏟️ 安排出场顺序，点击「开始比赛」</div>
+  </div>
+
+  <div class="result-summary" id="resultSummary"></div>
+
+  <div class="btn-row">
+    <button class="btn-hint" onclick="showHint()">💡 锦囊</button>
+    <button class="btn-start" id="btnStart" onclick="startBattle()" disabled>⏳ 请先安排出场</button>
+    <button class="btn-reset" onclick="resetAll()">🔄 重来</button>
+  </div>
+</div>
+
+<div class="hint-overlay" id="hintOverlay">
+  <div class="hint-card">
+    <h3>💡 田忌赛马策略</h3>
+    <p>
+      第1场：<b style="color:#66bb6a;">小稳 135</b> vs 大壮 180 → 输（用最弱消耗对手最强）<br>
+      第2场：<b style="color:#ff6e40;">小飞 175</b> vs 大勇 160 → 赢（用最强碾压对手中等）<br>
+      第3场：<b style="color:#4fc3f7;">小健 155</b> vs 大平 140 → 赢（用中等稳吃对手最弱）<br><br>
+      <b style="color:#ffab00;">总体 2:1 反败为胜！</b>
+    </p>
+    <button onclick="closeHint()">知道了</button>
+  </div>
+</div>
+
+<script>
+  var slots = [null, null, null];
+  var selectedTier = null;
+
+  var opponentOrder = [
+    { tier: 'fast', name: '大壮', score: 180, emoji: '🏃' },
+    { tier: 'mid',  name: '大勇', score: 160, emoji: '🤸' },
+    { tier: 'slow', name: '大平', score: 140, emoji: '🚶' }
+  ];
+
+  function selectPlayer(el) {
+    if (el.classList.contains('used')) return;
+    var tier = el.dataset.tier;
+    document.querySelectorAll('.pool-player.selected').forEach(function(h) { h.classList.remove('selected'); });
+    document.querySelectorAll('.battle-slot.target').forEach(function(s) { s.classList.remove('target'); });
+    if (selectedTier === tier) {
+      selectedTier = null;
+      document.getElementById('selectHint').textContent = '👆 选一名队员，再点左边的出场位';
+      return;
+    }
+    selectedTier = tier;
+    el.classList.add('selected');
+    document.getElementById('selectHint').textContent = '✅ 已选中「' + el.dataset.name + '（' + el.dataset.score + '个）」点出场位';
+    document.querySelectorAll('#deploySlots .battle-slot').forEach(function(s) {
+      if (!slots[parseInt(s.dataset.round)]) s.classList.add('target');
+    });
+  }
+
+  function placeInSlot(el) {
+    var ri = parseInt(el.dataset.round);
+    if (slots[ri]) {
+      var data = slots[ri];
+      slots[ri] = null;
+      el.classList.remove('filled');
+      el.querySelector('.bs-empty').style.display = '';
+      el.querySelector('.bs-emoji').style.display = 'none';
+      el.querySelector('.bs-emoji').textContent = '';
+      el.querySelector('.bs-name').textContent = '';
+      var p = document.querySelector('.pool-player[data-tier="' + data.tier + '"]');
+      if (p) p.classList.remove('used');
+      document.getElementById('resultSummary').classList.remove('show');
+      updateTargets(); checkAllReady();
+      return;
+    }
+    if (!selectedTier) {
+      var hint = document.getElementById('selectHint');
+      hint.textContent = '🖐️ 请先在队员列表中选一名队员';
+      setTimeout(function() { hint.textContent = '👆 选一名队员，再点左边的出场位'; }, 1500);
+      return;
+    }
+    var player = document.querySelector('.pool-player[data-tier="' + selectedTier + '"]');
+    if (!player || player.classList.contains('used')) return;
+    var data = {
+      tier: player.dataset.tier, name: player.dataset.name,
+      score: parseInt(player.dataset.score), emoji: player.dataset.emoji
+    };
+    slots[ri] = data;
+    player.classList.add('used');
+    el.classList.add('filled');
+    el.querySelector('.bs-empty').style.display = 'none';
+    el.querySelector('.bs-emoji').style.display = '';
+    el.querySelector('.bs-emoji').textContent = data.emoji;
+    el.querySelector('.bs-name').textContent = data.name;
+    document.querySelectorAll('.pool-player.selected').forEach(function(h) { h.classList.remove('selected'); });
+    document.querySelectorAll('.battle-slot.target').forEach(function(s) { s.classList.remove('target'); });
+    selectedTier = null;
+    document.getElementById('selectHint').textContent =
+      slots.every(function(s) { return s; }) ? '✅ 出场顺序已排好，开始比赛！' : '👆 继续安排出场顺序';
+    updateTargets(); checkAllReady();
+  }
+
+  function updateTargets() {
+    document.querySelectorAll('#deploySlots .battle-slot').forEach(function(s) {
+      var ri = parseInt(s.dataset.round);
+      if (!slots[ri] && selectedTier) s.classList.add('target');
+      else s.classList.remove('target');
+    });
+  }
+
+  function checkAllReady() {
+    var all = slots.every(function(s) { return s !== null; });
+    var btn = document.getElementById('btnStart');
+    btn.disabled = !all;
+    btn.textContent = all ? '🏁 开始比赛！' : '⏳ 请先安排出场';
+    if (!all) document.getElementById('resultSummary').classList.remove('show');
+  }
+
+  // ===== 比赛动画 =====
+  function startBattle() {
+    if (!slots.every(function(s) { return s; })) return;
+    var btn = document.getElementById('btnStart');
+    btn.disabled = true; btn.textContent = '🏟️ 比赛中...';
+    document.getElementById('resultSummary').classList.remove('show');
+
+    var arena = document.getElementById('battleArena');
+    var ourWins = 0, theirWins = 0;
+    var roundResults = [];
+
+    function buildArena(i, ours, theirs) {
+      arena.innerHTML =
+        '<div class="arena-header">🏁 第'+(i+1)+'场 ' + ours.emoji + ' ' + ours.name + ' vs ' + theirs.emoji + ' ' + theirs.name + '</div>'+
+        '<div class="arena-floor">'+
+          '<div class="arena-half">'+
+            '<span class="half-label us">二年·' + ours.name + '</span>'+
+            '<div class="jumper" id="jmpUs'+i+'">' + ours.emoji + '</div>'+
+            '<div class="score-display us" id="scrUs'+i+'">0</div>'+
+          '</div>'+
+          '<div class="vs-badge">VS</div>'+
+          '<div class="arena-half">'+
+            '<span class="half-label them">一班·' + theirs.name + '</span>'+
+            '<div class="jumper" id="jmpThem'+i+'">' + theirs.emoji + '</div>'+
+            '<div class="score-display them" id="scrThem'+i+'">0</div>'+
+          '</div>'+
+        '</div>'+
+        '<div class="arena-status" id="as'+i+'">3...</div>';
+    }
+
+    function runRound(i) {
+      return new Promise(function(resolve) {
+        var ours = slots[i], theirs = opponentOrder[i];
+        buildArena(i, ours, theirs);
+
+        var scrUs = document.getElementById('scrUs'+i);
+        var scrThem = document.getElementById('scrThem'+i);
+        var jmpUs = document.getElementById('jmpUs'+i);
+        var jmpThem = document.getElementById('jmpThem'+i);
+        var st = document.getElementById('as'+i);
+
+        var usStep = ours.score / 90;
+        var themStep = theirs.score / 90;
+
+        var usFinal = ours.score;
+        var themFinal = theirs.score;
+        var isDraw = (usFinal === themFinal);
+        var ourWin = !isDraw && usFinal > themFinal;
+
+        var cd = 3;
+        var cdTimer = setInterval(function() {
+          cd--;
+          if (cd > 0) { st.textContent = cd + '...'; st.style.color = '#ffab00'; }
+          else {
+            st.textContent = '🪢 开始！'; st.style.color = '#ff8a65';
+            clearInterval(cdTimer);
+            jmpUs.classList.add('bouncing'); jmpThem.classList.add('bouncing');
+            countUp();
+          }
+        }, 700);
+
+        var usCur = 0, themCur = 0;
+        function countUp() {
+          var t = setInterval(function() {
+            // Calculate target for this frame
+            usCur = Math.min(usCur + usStep, usFinal);
+            themCur = Math.min(themCur + themStep, themFinal);
+
+            scrUs.textContent = Math.floor(usCur);
+            scrThem.textContent = Math.floor(themCur);
+
+            if (usCur >= usFinal && themCur >= themFinal) {
+              clearInterval(t);
+              jmpUs.classList.remove('bouncing'); jmpThem.classList.remove('bouncing');
+              scrUs.textContent = usFinal;
+              scrThem.textContent = themFinal;
+
+              if (isDraw) {
+                st.innerHTML = '🟡 <b style="color:#ffd700;">平局！ ' + usFinal + ':' + themFinal + '</b>';
+              } else if (ourWin) {
+                st.innerHTML = '🟢 <b style="color:#ff8a65;">五年二班胜！ ' + usFinal + ':' + themFinal + '</b>';
+                ourWins++;
+                jmpUs.style.fontSize = '3.6rem';
+              } else {
+                st.innerHTML = '🔵 <b style="color:#4fc3f7;">五年一班胜... ' + usFinal + ':' + themFinal + '</b>';
+                theirWins++;
+                jmpThem.style.fontSize = '3.6rem';
+              }
+              roundResults.push({
+                round: i+1,
+                ours: ours.name + '(' + usFinal + ')',
+                theirs: theirs.name + '(' + themFinal + ')',
+                ourWin: ourWin,
+                draw: isDraw
+              });
+              setTimeout(resolve, 700);
+            }
+          }, 40);
+        }
+      });
+    }
+
+    async function runAll() {
+      for (var i = 0; i < 3; i++) {
+        await runRound(i);
+        if (i < 2) await new Promise(function(r) { setTimeout(r, 500); });
+      }
+
+      var nn = roundResults.map(function(r) {
+        var cls = r.draw ? 'draw' : (r.ourWin ? 'win' : 'lose');
+        var sym = r.draw ? '🤝' : (r.ourWin ? '✅' : '❌');
+        return '<div class="result-chip '+cls+' fade-in">第'+r.round+'场: '+r.ours+' vs '+r.theirs+' → '+sym+'</div>';
+      });
+      var finalCls = (ourWins>theirWins) ? 'win' : (ourWins===theirWins ? 'draw' : 'lose');
+      var finalMsg = (ourWins>theirWins) ? '🎉 五年二班 '+ourWins+':'+theirWins+' 获胜！策略成功！' :
+        (ourWins===theirWins ? '🤝 五年二班 '+ourWins+':'+theirWins+' 平局' :
+        '💔 五年二班 '+ourWins+':'+theirWins+' 失败，再想想策略...');
+      arena.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;flex:1;padding:8px;">'+
+        nn.join('') + '<div class="result-chip '+finalCls+' fade-in" style="font-size:0.95rem;">'+finalMsg+'</div>'+
+        '<div style="color:rgba(255,255,255,0.3);font-size:0.7rem;margin-top:4px;">点击「重来」再战</div></div>';
+
+      btn.disabled = false; btn.textContent = '🔄 再来一局'; btn.onclick = resetAll;
+
+    }
+
+    runAll();
+  }
+
+  function showHint() { document.getElementById('hintOverlay').classList.add('show'); }
+  function closeHint() { document.getElementById('hintOverlay').classList.remove('show'); }
+
+  function resetAll() {
+    slots = [null, null, null]; selectedTier = null;
+    document.querySelectorAll('.pool-player').forEach(function(p) { p.classList.remove('used','selected'); });
+    document.querySelectorAll('#deploySlots .battle-slot').forEach(function(s) {
+      s.classList.remove('filled','target');
+      s.querySelector('.bs-empty').style.display = '';
+      s.querySelector('.bs-emoji').style.display = 'none';
+      s.querySelector('.bs-emoji').textContent = '';
+      s.querySelector('.bs-name').textContent = '';
+    });
+    document.getElementById('battleArena').innerHTML =
+      '<div class="arena-placeholder">🏟️ 安排出场顺序，点击「开始比赛」</div>';
+    document.getElementById('resultSummary').classList.remove('show');
+    document.getElementById('selectHint').textContent = '👆 选一名队员，再点左边的出场位';
+    var btn = document.getElementById('btnStart');
+    btn.disabled = true; btn.textContent = '⏳ 请先安排出场'; btn.onclick = startBattle;
+    closeHint();
+  }
+</script>
+</body>
+</html>
