@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>田忌赛马</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    width: 100%; height: 100%; overflow: hidden;
+    font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+    background: linear-gradient(180deg, #0d1b0d 0%, #1a3a1a 30%, #2d5a2d 60%, #1a3a1a 100%);
+    color: #fff; display: flex; flex-direction: column; align-items: center;
+    -webkit-user-select: none; user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* ===== 希沃白板专用优化 ===== */
+  /* 所有可点击元素不小于 48px 高度（触屏标准）*/
+  /* 不使用 :hover，全部用 :active */
+  /* 字体更大，方便后排学生看清 */
+
+  .title-bar {
+    text-align: center; padding: 6px 20px 2px; width: 100%; flex-shrink: 0;
+  }
+  .title-bar h1 {
+    font-size: 1.5rem; letter-spacing: 3px; margin: 0;
+    background: linear-gradient(90deg, #ffd700, #ffab00, #ffd700);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .main-area {
+    flex: 1; width: 100%; max-width: 1200px; display: flex; flex-direction: column;
+    padding: 6px 18px; gap: 8px; min-height: 0;
+  }
+
+  /* ===== 马厩（横向）===== */
+  .stable-row {
+    display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+  }
+  .stable-label {
+    font-size: 0.85rem; color: rgba(255,255,255,0.4); white-space: nowrap; letter-spacing: 2px;
+  }
+  .stable-horses {
+    display: flex; gap: 16px; flex: 1; justify-content: center;
+  }
+  .stable-horse {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 22px; min-height: 52px; border-radius: 12px;
+    cursor: pointer; background: rgba(255,255,255,0.06);
+    border: 2.5px solid transparent; transition: border-color 0.12s, background 0.12s;
+  }
+  .stable-horse:active { background: rgba(255,255,255,0.14); }
+  .stable-horse.selected {
+    border-color: #ffd700; background: rgba(255,215,0,0.2);
+    box-shadow: 0 0 16px rgba(255,215,0,0.3);
+  }
+  .stable-horse.used { opacity: 0.15; pointer-events: none; }
+  .stable-horse .sh-emoji { font-size: 2.4rem; flex-shrink: 0; }
+  .stable-horse .sh-name { font-weight: bold; font-size: 0.9rem; }
+  .stable-horse .sh-tier { font-size: 0.7rem; color: rgba(255,255,255,0.4); }
+  .stable-horse .sh-info { display: flex; gap: 8px; align-items: center; }
+  .tier-super .sh-name { color: #ffd700; }
+  .tier-mid .sh-name { color: #c0c0c0; }
+  .tier-low .sh-name { color: #cd7f32; }
+
+  /* ===== 两军对垒 ===== */
+  .battle-row {
+    display: flex; gap: 14px; flex: 1 1 0; min-height: 0;
+  }
+  .camp {
+    flex: 1; border-radius: 12px; padding: 10px 14px;
+    display: flex; flex-direction: column; gap: 6px; min-width: 0; min-height: 0;
+  }
+  .camp-ours {
+    background: rgba(30, 60, 120, 0.25);
+    border: 2px solid rgba(79, 195, 247, 0.25);
+  }
+  .camp-oppo {
+    background: rgba(120, 30, 30, 0.25);
+    border: 2px solid rgba(244, 67, 54, 0.25);
+  }
+  .camp-header {
+    display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+    font-size: 0.9rem; font-weight: bold; padding-bottom: 5px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+  .camp-ours .camp-header { color: #4fc3f7; }
+  .camp-oppo .camp-header { color: #ef9a9a; }
+
+  .camp-slots {
+    display: flex; flex-direction: column; gap: 5px; flex: 1; min-height: 0;
+  }
+
+  .battle-slot {
+    display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+    border-radius: 10px; flex: 1; min-height: 50px;
+    border: 2.5px dashed rgba(255,255,255,0.12);
+    background: rgba(255,255,255,0.03);
+    transition: border-color 0.12s, background 0.12s;
+  }
+  /* 田忌侧可点击 */
+  .camp-ours .battle-slot { cursor: pointer; }
+  .camp-ours .battle-slot:active { background: rgba(255,255,255,0.08); }
+  .camp-ours .battle-slot.target {
+    border-color: #66bb6a; background: rgba(102,187,106,0.15);
+  }
+  .camp-ours .battle-slot.filled {
+    border-style: solid; border-color: #4fc3f7; background: rgba(79,195,247,0.1);
+  }
+  /* 齐王侧不可点 */
+  .camp-oppo .battle-slot {
+    border-style: solid; border-color: rgba(244,67,54,0.18);
+    background: rgba(244,67,54,0.08);
+  }
+
+  .battle-slot .bs-round {
+    font-size: 0.7rem; color: rgba(255,255,255,0.3);
+    width: 40px; flex-shrink: 0; font-weight: bold;
+  }
+  .battle-slot .bs-emoji {
+    font-size: 1.8rem; flex-shrink: 0; width: 38px; text-align: center;
+  }
+  .battle-slot .bs-empty {
+    font-size: 1.5rem; color: rgba(255,255,255,0.08);
+    width: 38px; text-align: center; flex-shrink: 0;
+  }
+  .battle-slot .bs-name {
+    font-size: 0.88rem; font-weight: bold; min-width: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .battle-slot .bs-tag {
+    font-size: 0.65rem; color: rgba(255,255,255,0.3); flex-shrink: 0; margin-left: auto;
+  }
+
+  /* VS 中间列 */
+  .vs-col {
+    display: flex; flex-direction: column; gap: 5px; justify-content: center;
+    align-items: center; flex-shrink: 0; width: 36px;
+    padding-top: 28px;
+  }
+  .vs-col span {
+    flex: 1; display: flex; align-items: center;
+    font-size: 0.8rem; font-weight: bold;
+    color: rgba(255,215,0,0.25); min-height: 50px;
+  }
+
+  /* 提示 */
+  .select-hint {
+    text-align: center; color: rgba(255,255,255,0.35); font-size: 0.7rem;
+    flex-shrink: 0; min-height: 1.2em;
+  }
+
+  /* ===== 赛道 ===== */
+  .race-arena {
+    background: rgba(0,0,0,0.3); border-radius: 12px; padding: 10px 16px;
+    flex: 0 1 28%; display: flex; flex-direction: column; overflow: hidden;
+    min-height: 100px;
+    border: 1.5px solid rgba(255,255,255,0.06);
+  }
+  .track-placeholder {
+    flex: 1; display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.18); font-size: 0.9rem;
+  }
+  .track-header {
+    text-align: center; font-size: 0.9rem; color: #ffd700;
+    font-weight: bold; margin-bottom: 6px; flex-shrink: 0;
+  }
+  .track-ground {
+    width: 100%; flex: 1; background: linear-gradient(180deg, #5a8f4a 0%, #3d6b30 40%, #2d5520 100%);
+    border-radius: 8px; position: relative; overflow: hidden;
+    border: 3px solid #5d4037; display: flex; flex-direction: column;
+  }
+  .track-lane {
+    position: relative; flex: 1; display: flex; align-items: center;
+    border-bottom: 1px dashed rgba(255,255,255,0.06);
+  }
+  .track-lane:last-child { border-bottom: none; }
+  .lane-label {
+    position: absolute; left: 5px; top: 50%; transform: translateY(-50%);
+    font-size: 0.6rem; font-weight: bold; z-index: 2;
+    padding: 1px 6px; border-radius: 3px;
+  }
+  .lane-label.ours { background: rgba(79,195,247,0.55); color: #000; }
+  .lane-label.theirs { background: rgba(244,67,54,0.55); color: #fff; }
+  .finish-line {
+    position: absolute; right: 3px; top: 0; bottom: 0; width: 4px;
+    background: repeating-linear-gradient(0deg, #fff 0px, #fff 4px, #000 4px, #000 8px);
+    z-index: 3;
+  }
+  .horse-runner {
+    position: absolute; left: 50px; top: 50%; transform: translateY(-50%);
+    font-size: 2.6rem; z-index: 4; line-height: 1;
+    transition: left 0.06s linear;
+  }
+  .horse-runner.galloping { animation: gallop 0.2s ease-in-out infinite; }
+  @keyframes gallop { 0%,100%{margin-top:0} 25%{margin-top:-6px} 75%{margin-top: 5px} }
+  .round-status {
+    text-align: center; margin-top: 4px; font-size: 0.85rem; font-weight: bold;
+    flex-shrink: 0; min-height: 20px;
+  }
+  .dust {
+    position: absolute; width: 5px; height: 5px; border-radius: 50%;
+    background: rgba(210,180,140,0.45); z-index: 3;
+    animation: dustFade 0.5s ease-out forwards;
+  }
+  @keyframes dustFade {
+    0% { opacity: 0.5; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-15px) scale(1.5); }
+  }
+
+  /* 结果 */
+  .result-summary {
+    display: none; justify-content: center; gap: 10px; flex-shrink: 0;
+  }
+  .result-summary.show { display: flex; }
+  .result-chip {
+    padding: 5px 12px; border-radius: 14px; font-size: 0.8rem; font-weight: bold;
+  }
+  .result-chip.win { background: rgba(76,175,80,0.18); color: #66bb6a; border: 1.5px solid #4caf50; }
+  .result-chip.lose { background: rgba(244,67,54,0.15); color: #ef5350; border: 1.5px solid #f44336; }
+  .result-chip.draw { background: rgba(255,215,0,0.12); color: #ffd700; border: 1.5px solid #ffd700; }
+
+  /* 按钮 */
+  .btn-row {
+    display: flex; gap: 10px; justify-content: center; flex-shrink: 0; padding-bottom: 4px;
+  }
+  button {
+    padding: 10px 22px; min-height: 48px; border: none; border-radius: 10px;
+    font-size: 0.88rem; font-weight: bold; cursor: pointer; transition: transform 0.1s;
+    font-family: inherit; letter-spacing: 1px;
+  }
+  button:active { transform: scale(0.95); }
+  .btn-race {
+    background: linear-gradient(135deg, #e53935, #ff8c00);
+    color: #fff; font-size: 0.95rem; padding: 12px 32px;
+  }
+  .btn-race:active:not(:disabled) { box-shadow: 0 4px 16px rgba(229,57,53,0.5); }
+  .btn-race:disabled { opacity: 0.25; cursor: not-allowed; }
+  .btn-reset { background: rgba(255,255,255,0.1); color: #ccc; font-size: 0.85rem; }
+  .btn-reset:active { background: rgba(255,255,255,0.2); }
+  .btn-hint { background: rgba(255,215,0,0.12); color: #ffd700; font-size: 0.85rem; }
+  .btn-hint:active { background: rgba(255,215,0,0.22); }
+
+  /* 弹窗 */
+  .hint-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); z-index: 100;
+    justify-content: center; align-items: center;
+  }
+  .hint-overlay.show { display: flex; }
+  .hint-card {
+    background: #0d1b0d; border: 2.5px solid #ffd700; border-radius: 18px;
+    padding: 28px; text-align: center; max-width: 420px; margin: 24px;
+  }
+  .hint-card h3 { color: #ffd700; margin-bottom: 14px; font-size: 1.2rem; }
+  .hint-card p { color: #ccc; line-height: 1.8; font-size: 0.95rem; }
+  .hint-card button {
+    margin-top: 16px; background: #ffd700; color: #000; padding: 10px 30px;
+    min-height: 44px; font-size: 1rem;
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .fade-in { animation: fadeInUp 0.4s ease-out; }
+</style>
+</head>
+<body>
+
+<div class="title-bar"><h1>🐎 田忌赛马</h1></div>
+
+<div class="main-area">
+
+  <!-- 马厩 -->
+  <div class="stable-row">
+    <span class="stable-label">🏠 马厩</span>
+    <div class="stable-horses" id="stableHorses">
+      <div class="stable-horse tier-super" data-tier="super" data-name="上等马" data-speed="90" data-emoji="🐎" onclick="selectHorse(this)">
+        <span class="sh-emoji">🐎</span>
+        <div class="sh-info">
+          <span class="sh-name">上等马</span>
+          <span class="sh-tier">⭐⭐⭐</span>
+        </div>
+      </div>
+      <div class="stable-horse tier-mid" data-tier="mid" data-name="中等马" data-speed="60" data-emoji="🐴" onclick="selectHorse(this)">
+        <span class="sh-emoji">🐴</span>
+        <div class="sh-info">
+          <span class="sh-name">中等马</span>
+          <span class="sh-tier">⭐⭐</span>
+        </div>
+      </div>
+      <div class="stable-horse tier-low" data-tier="low" data-name="下等马" data-speed="30" data-emoji="🦄" onclick="selectHorse(this)">
+        <span class="sh-emoji">🦄</span>
+        <div class="sh-info">
+          <span class="sh-name">下等马</span>
+          <span class="sh-tier">⭐</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="select-hint" id="selectHint">👆 选一匹马，再点左边的布阵位</div>
+
+  <!-- 两军对垒 -->
+  <div class="battle-row">
+    <div class="camp camp-ours">
+      <div class="camp-header">🛡️ 田忌布阵</div>
+      <div class="camp-slots" id="deploySlots">
+        <div class="battle-slot" data-round="0" onclick="placeInSlot(this)">
+          <span class="bs-round">第 1 场</span>
+          <span class="bs-empty">+</span>
+          <span class="bs-emoji"></span>
+          <span class="bs-name"></span>
+        </div>
+        <div class="battle-slot" data-round="1" onclick="placeInSlot(this)">
+          <span class="bs-round">第 2 场</span>
+          <span class="bs-empty">+</span>
+          <span class="bs-emoji"></span>
+          <span class="bs-name"></span>
+        </div>
+        <div class="battle-slot" data-round="2" onclick="placeInSlot(this)">
+          <span class="bs-round">第 3 场</span>
+          <span class="bs-empty">+</span>
+          <span class="bs-emoji"></span>
+          <span class="bs-name"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="vs-col">
+      <span>⚔️</span>
+      <span>⚔️</span>
+      <span>⚔️</span>
+    </div>
+
+    <div class="camp camp-oppo">
+      <div class="camp-header">👑 齐王出场</div>
+      <div class="camp-slots">
+        <div class="battle-slot">
+          <span class="bs-round">第 1 场</span>
+          <span class="bs-emoji">🐎</span>
+          <span class="bs-name" style="color:rgba(255,255,255,0.7);">上等马</span>
+          <span class="bs-tag">⚡⚡⚡</span>
+        </div>
+        <div class="battle-slot">
+          <span class="bs-round">第 2 场</span>
+          <span class="bs-emoji">🐴</span>
+          <span class="bs-name" style="color:rgba(255,255,255,0.7);">中等马</span>
+          <span class="bs-tag">⚡⚡</span>
+        </div>
+        <div class="battle-slot">
+          <span class="bs-round">第 3 场</span>
+          <span class="bs-emoji">🦄</span>
+          <span class="bs-name" style="color:rgba(255,255,255,0.7);">下等马</span>
+          <span class="bs-tag">⚡</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 赛道 -->
+  <div class="race-arena" id="raceArena">
+    <div class="track-placeholder" id="trackPlaceholder">🏇 布阵完成，点击「开始比赛」观战</div>
+  </div>
+
+  <!-- 结果 -->
+  <div class="result-summary" id="resultSummary"></div>
+
+  <!-- 按钮 -->
+  <div class="btn-row">
+    <button class="btn-hint" onclick="showHint()">💡 锦囊</button>
+    <button class="btn-race" id="btnRace" onclick="startRace()" disabled>⏳ 请先布阵</button>
+    <button class="btn-reset" onclick="resetAll()">🔄 重来</button>
+  </div>
+</div>
+
+<!-- 弹窗 -->
+<div class="hint-overlay" id="hintOverlay">
+  <div class="hint-card">
+    <h3>💡 孙膑的锦囊</h3>
+    <p>
+      第1场用 <b style="color:#cd7f32;">下等马</b> 对齐王上等马 → 输<br>
+      第2场用 <b style="color:#ffd700;">上等马</b> 对齐王中等马 → 赢<br>
+      第3场用 <b style="color:#c0c0c0;">中等马</b> 对齐王下等马 → 赢<br><br>
+      <b style="color:#ffd700;">2:1 反败为胜！</b>
+    </p>
+    <button onclick="closeHint()">知道了</button>
+  </div>
+</div>
+
+<script>
+  let slots = [null, null, null];
+  let selectedTier = null;
+
+  const opponentOrder = [
+    { tier: 'super', name: '上等马', speed: 90, emoji: '🐎' },
+    { tier: 'mid',   name: '中等马', speed: 60, emoji: '🐴' },
+    { tier: 'low',   name: '下等马', speed: 30, emoji: '🦄' }
+  ];
+
+  function selectHorse(el) {
+    if (el.classList.contains('used')) return;
+    const tier = el.dataset.tier;
+    document.querySelectorAll('.stable-horse.selected').forEach(h => h.classList.remove('selected'));
+    document.querySelectorAll('.battle-slot.target').forEach(s => s.classList.remove('target'));
+    if (selectedTier === tier) {
+      selectedTier = null;
+      document.getElementById('selectHint').textContent = '👆 选一匹马，再点左边的布阵位';
+      return;
+    }
+    selectedTier = tier;
+    el.classList.add('selected');
+    document.getElementById('selectHint').textContent = '✅ 已选中「' + el.dataset.name + '」，点击布阵位';
+    document.querySelectorAll('#deploySlots .battle-slot').forEach(s => {
+      if (!slots[parseInt(s.dataset.round)]) s.classList.add('target');
+    });
+  }
+
+  function placeInSlot(el) {
+    const ri = parseInt(el.dataset.round);
+    if (slots[ri]) {
+      const data = slots[ri];
+      slots[ri] = null;
+      el.classList.remove('filled');
+      el.querySelector('.bs-empty').style.display = '';
+      el.querySelector('.bs-emoji').style.display = 'none';
+      el.querySelector('.bs-emoji').textContent = '';
+      el.querySelector('.bs-name').textContent = '';
+      const h = document.querySelector('.stable-horse[data-tier="' + data.tier + '"]');
+      if (h) h.classList.remove('used');
+      document.getElementById('resultSummary').classList.remove('show');
+      updateTargets(); checkAllFilled();
+      return;
+    }
+    if (!selectedTier) {
+      const hint = document.getElementById('selectHint');
+      hint.textContent = '🖐️ 请先在马厩选一匹马';
+      setTimeout(function() { hint.textContent = '👆 选一匹马，再点左边的布阵位'; }, 1500);
+      return;
+    }
+    const horse = document.querySelector('.stable-horse[data-tier="' + selectedTier + '"]');
+    if (!horse || horse.classList.contains('used')) return;
+    const data = {
+      tier: horse.dataset.tier, name: horse.dataset.name,
+      speed: parseInt(horse.dataset.speed), emoji: horse.dataset.emoji
+    };
+    slots[ri] = data;
+    horse.classList.add('used');
+    el.classList.add('filled');
+    el.querySelector('.bs-empty').style.display = 'none';
+    el.querySelector('.bs-emoji').style.display = '';
+    el.querySelector('.bs-emoji').textContent = data.emoji;
+    el.querySelector('.bs-name').textContent = data.name;
+    document.querySelectorAll('.stable-horse.selected').forEach(function(h) { h.classList.remove('selected'); });
+    document.querySelectorAll('.battle-slot.target').forEach(function(s) { s.classList.remove('target'); });
+    selectedTier = null;
+    document.getElementById('selectHint').textContent =
+      slots.every(function(s) { return s; }) ? '✅ 布阵完成，开始比赛！' : '👆 继续选马布阵';
+    updateTargets(); checkAllFilled();
+  }
+
+  function updateTargets() {
+    document.querySelectorAll('#deploySlots .battle-slot').forEach(function(s) {
+      var ri = parseInt(s.dataset.round);
+      if (!slots[ri] && selectedTier) s.classList.add('target');
+      else s.classList.remove('target');
+    });
+  }
+
+  function checkAllFilled() {
+    var all = slots.every(function(s) { return s !== null; });
+    var btn = document.getElementById('btnRace');
+    btn.disabled = !all;
+    btn.textContent = all ? '🏁 开始比赛！' : '⏳ 请先布阵';
+    if (!all) document.getElementById('resultSummary').classList.remove('show');
+  }
+
+  // ===== 比赛 =====
+  function startRace() {
+    if (!slots.every(function(s) { return s; })) return;
+    var btn = document.getElementById('btnRace');
+    btn.disabled = true; btn.textContent = '🏇 比赛中...';
+    document.getElementById('resultSummary').classList.remove('show');
+    var arena = document.getElementById('raceArena');
+    var ourWins = 0, theirWins = 0;
+    var roundResults = [];
+
+    function buildTrack(i, ours, theirs) {
+      arena.innerHTML =
+        '<div class="track-header">🏁 第'+(i+1)+'场：'+ours.emoji+' '+ours.name+' vs '+theirs.emoji+' '+theirs.name+'</div>'+
+        '<div class="track-ground" id="tg'+i+'">'+
+          '<div class="track-lane"><span class="lane-label ours">田忌</span><div class="horse-runner" id="our'+i+'">'+ours.emoji+'</div><div class="finish-line"></div></div>'+
+          '<div class="track-lane"><span class="lane-label theirs">齐王</span><div class="horse-runner" id="their'+i+'">'+theirs.emoji+'</div><div class="finish-line"></div></div>'+
+        '</div>'+
+        '<div class="round-status" id="rs'+i+'">3...</div>';
+    }
+
+    function dust(tg, el) {
+      var r1 = tg.getBoundingClientRect(), r2 = el.getBoundingClientRect();
+      var d = document.createElement('div'); d.className = 'dust';
+      d.style.left = (r2.left - r1.left + r2.width/2) + 'px';
+      d.style.top = (r2.top - r1.top + r2.height/2) + 'px';
+      tg.appendChild(d);
+      setTimeout(function() { d.remove(); }, 500);
+    }
+
+    function runRound(i) {
+      return new Promise(function(resolve) {
+        var ours = slots[i], theirs = opponentOrder[i];
+        buildTrack(i, ours, theirs);
+        var ourH = document.getElementById('our'+i);
+        var theirH = document.getElementById('their'+i);
+        var tg = document.getElementById('tg'+i);
+        var st = document.getElementById('rs'+i);
+        var finish = tg.clientWidth - 45, start = 50;
+        var ourSpd = ours.speed / 10;
+        var theirSpd = theirs.speed / 10;
+        // 同档位→平局；速度快的赢
+        var isDraw = (ourSpd === theirSpd);
+        var ourWin = !isDraw && ourSpd > theirSpd;
+
+        var cd = 3;
+        var cdTimer = setInterval(function() {
+          cd--;
+          if (cd > 0) { st.textContent = cd + '...'; st.style.color = '#ffd700'; }
+          else {
+            st.textContent = '🏇 冲！'; st.style.color = '#ff8c00';
+            clearInterval(cdTimer);
+            ourH.classList.add('galloping'); theirH.classList.add('galloping');
+            raceLoop();
+          }
+        }, 700);
+
+        var op = start, tp = start, tick = 0;
+        function raceLoop() {
+          var t = setInterval(function() {
+            op += ourSpd; tp += theirSpd;
+            if (op > finish) op = finish; if (tp > finish) tp = finish;
+            ourH.style.left = op + 'px'; theirH.style.left = tp + 'px';
+            tick++;
+            if (tick%3===0 && op<finish) dust(tg, ourH);
+            if (tick%4===0 && tp<finish) dust(tg, theirH);
+            if (op >= finish || tp >= finish) {
+              clearInterval(t);
+              ourH.classList.remove('galloping'); theirH.classList.remove('galloping');
+              if (isDraw) {
+                st.innerHTML = '🟡 <b style="color:#ffd700;">平局！</b>';
+              } else if (ourWin) {
+                st.innerHTML = '🟢 <b style="color:#4fc3f7;">田忌胜！</b>';
+                ourWins++; ourH.style.fontSize = '3.2rem';
+              } else {
+                st.innerHTML = '🔴 <b style="color:#ef9a9a;">齐王胜...</b>';
+                theirWins++; theirH.style.fontSize = '3.2rem';
+              }
+              roundResults.push({ round:i+1, ours:ours.name, theirs:theirs.name, ourWin:ourWin, draw:isDraw });
+              setTimeout(resolve, 600);
+            }
+          }, 60);
+        }
+      });
+    }
+
+    async function runAll() {
+      for (var i = 0; i < 3; i++) {
+        await runRound(i);
+        if (i < 2) await new Promise(function(r) { setTimeout(r, 450); });
+      }
+      var nr = roundResults.map(function(r) {
+        var cls = r.draw ? 'draw' : (r.ourWin ? 'win' : 'lose');
+        var sym = r.draw ? '🤝' : (r.ourWin ? '✅' : '❌');
+        return '<div class="result-chip '+cls+' fade-in">第'+r.round+'场: '+r.ours+' vs '+r.theirs+' → '+sym+'</div>';
+      });
+      var finalCls = (ourWins>theirWins) ? 'win' : (ourWins===theirWins ? 'draw' : 'lose');
+      var finalMsg = (ourWins>theirWins) ? '🎉 田忌'+ourWins+':'+theirWins+' 获胜！' : (ourWins===theirWins ? '🤝 田忌'+ourWins+':'+theirWins+' 平局' : '💔 田忌'+ourWins+':'+theirWins+' 失败');
+      arena.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;flex:1;padding:8px;">'+
+        nr.join('') + '<div class="result-chip '+finalCls+' fade-in" style="font-size:0.95rem;">'+finalMsg+'</div>'+
+        '<div style="color:rgba(255,255,255,0.3);font-size:0.7rem;margin-top:4px;">点击「重来」再战</div></div>';
+      btn.disabled = false; btn.textContent = '🔄 再来一局'; btn.onclick = resetAll;
+
+    }
+    runAll();
+  }
+
+  function showHint() { document.getElementById('hintOverlay').classList.add('show'); }
+  function closeHint() { document.getElementById('hintOverlay').classList.remove('show'); }
+
+  function resetAll() {
+    slots = [null, null, null]; selectedTier = null;
+    document.querySelectorAll('.stable-horse').forEach(function(h) { h.classList.remove('used','selected'); });
+    document.querySelectorAll('#deploySlots .battle-slot').forEach(function(s) {
+      s.classList.remove('filled','target');
+      s.querySelector('.bs-empty').style.display = '';
+      s.querySelector('.bs-emoji').style.display = 'none';
+      s.querySelector('.bs-emoji').textContent = '';
+      s.querySelector('.bs-name').textContent = '';
+    });
+    document.getElementById('raceArena').innerHTML =
+      '<div class="track-placeholder">🏇 布阵完成，点击「开始比赛」观战</div>';
+    document.getElementById('resultSummary').classList.remove('show');
+    document.getElementById('selectHint').textContent = '👆 选一匹马，再点左边的布阵位';
+    var btn = document.getElementById('btnRace');
+    btn.disabled = true; btn.textContent = '⏳ 请先布阵'; btn.onclick = startRace;
+    closeHint();
+  }
+</script>
+</body>
+</html>
