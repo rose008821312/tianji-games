@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>田忌赛马</title>
+<title>齐威王识破孙膑</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
@@ -271,7 +271,7 @@
 </head>
 <body>
 
-<div class="title-bar"><h1>🐎 田忌赛马</h1></div>
+<div class="title-bar"><h1>🐎 齐威王识破孙膑</h1></div>
 
 <div class="main-area">
 
@@ -308,7 +308,7 @@
   <!-- 两军对垒 -->
   <div class="battle-row">
     <div class="camp camp-ours">
-      <div class="camp-header">🛡️ 田忌布阵</div>
+      <div class="camp-header">👑 齐威王布阵</div>
       <div class="camp-slots" id="deploySlots">
         <div class="battle-slot" data-round="0" onclick="placeInSlot(this)">
           <span class="bs-round">第 1 场</span>
@@ -338,25 +338,25 @@
     </div>
 
     <div class="camp camp-oppo">
-      <div class="camp-header">👑 齐王出场</div>
+      <div class="camp-header">🎓 田忌出场（孙膑计谋）</div>
       <div class="camp-slots">
         <div class="battle-slot">
           <span class="bs-round">第 1 场</span>
+          <span class="bs-emoji">🦄</span>
+          <span class="bs-name" style="color:rgba(255,255,255,0.7);">下等马</span>
+          <span class="bs-tag">⚡</span>
+        </div>
+        <div class="battle-slot">
+          <span class="bs-round">第 2 场</span>
           <span class="bs-emoji">🐎</span>
           <span class="bs-name" style="color:rgba(255,255,255,0.7);">上等马</span>
           <span class="bs-tag">⚡⚡⚡</span>
         </div>
         <div class="battle-slot">
-          <span class="bs-round">第 2 场</span>
+          <span class="bs-round">第 3 场</span>
           <span class="bs-emoji">🐴</span>
           <span class="bs-name" style="color:rgba(255,255,255,0.7);">中等马</span>
           <span class="bs-tag">⚡⚡</span>
-        </div>
-        <div class="battle-slot">
-          <span class="bs-round">第 3 场</span>
-          <span class="bs-emoji">🦄</span>
-          <span class="bs-name" style="color:rgba(255,255,255,0.7);">下等马</span>
-          <span class="bs-tag">⚡</span>
         </div>
       </div>
     </div>
@@ -372,7 +372,7 @@
 
   <!-- 按钮 -->
   <div class="btn-row">
-    <button class="btn-hint" onclick="showHint()">💡 锦囊</button>
+    <button class="btn-hint" onclick="showHint()">🧠 破计</button>
     <button class="btn-race" id="btnRace" onclick="startRace()" disabled>⏳ 请先布阵</button>
     <button class="btn-reset" onclick="resetAll()">🔄 重来</button>
   </div>
@@ -381,12 +381,15 @@
 <!-- 弹窗 -->
 <div class="hint-overlay" id="hintOverlay">
   <div class="hint-card">
-    <h3>💡 孙膑的锦囊</h3>
+    <h3>🧠 破解孙膑计谋</h3>
     <p>
-      第1场用 <b style="color:#cd7f32;">下等马</b> 对齐王上等马 → 输<br>
-      第2场用 <b style="color:#ffd700;">上等马</b> 对齐王中等马 → 赢<br>
-      第3场用 <b style="color:#c0c0c0;">中等马</b> 对齐王下等马 → 赢<br><br>
-      <b style="color:#ffd700;">2:1 反败为胜！</b>
+      孙膑的计谋：<b style="color:#cd7f32;">下→上→中</b><br>
+      （用下等马输给齐王最强的马，<br>再用上等马赢齐王的中等马，<br>最后用中等马赢齐王的下等马）<br><br>
+      破解之法：<b style="color:#ffd700;">中→下→上</b><br>
+      第1场用<b style="color:#c0c0c0;">中等马</b>对下等马 → 赢<br>
+      第2场用<b style="color:#cd7f32;">下等马</b>对上等马 → 输<br>
+      第3场用<b style="color:#ffd700;">上等马</b>对中等马 → 赢<br><br>
+      <b style="color:#ffd700;">2:1 大破孙膑计谋！</b>
     </p>
     <button onclick="closeHint()">知道了</button>
   </div>
@@ -396,10 +399,11 @@
   let slots = [null, null, null];
   let selectedTier = null;
 
+  // 孙膑给田忌的计谋：下→上→中（以下对上，以上对中，以中对下）
   const opponentOrder = [
+    { tier: 'low',   name: '下等马', speed: 30, emoji: '🦄' },
     { tier: 'super', name: '上等马', speed: 90, emoji: '🐎' },
-    { tier: 'mid',   name: '中等马', speed: 60, emoji: '🐴' },
-    { tier: 'low',   name: '下等马', speed: 30, emoji: '🦄' }
+    { tier: 'mid',   name: '中等马', speed: 60, emoji: '🐴' }
   ];
 
   function selectHorse(el) {
@@ -493,8 +497,8 @@
       arena.innerHTML =
         '<div class="track-header">🏁 第'+(i+1)+'场：'+ours.emoji+' '+ours.name+' vs '+theirs.emoji+' '+theirs.name+'</div>'+
         '<div class="track-ground" id="tg'+i+'">'+
-          '<div class="track-lane"><span class="lane-label ours">田忌</span><div class="horse-runner" id="our'+i+'">'+ours.emoji+'</div><div class="finish-line"></div></div>'+
-          '<div class="track-lane"><span class="lane-label theirs">齐王</span><div class="horse-runner" id="their'+i+'">'+theirs.emoji+'</div><div class="finish-line"></div></div>'+
+          '<div class="track-lane"><span class="lane-label ours">齐王</span><div class="horse-runner" id="our'+i+'">'+ours.emoji+'</div><div class="finish-line"></div></div>'+
+          '<div class="track-lane"><span class="lane-label theirs">田忌</span><div class="horse-runner" id="their'+i+'">'+theirs.emoji+'</div><div class="finish-line"></div></div>'+
         '</div>'+
         '<div class="round-status" id="rs'+i+'">3...</div>';
     }
@@ -550,10 +554,10 @@
               if (isDraw) {
                 st.innerHTML = '🟡 <b style="color:#ffd700;">平局！</b>';
               } else if (ourWin) {
-                st.innerHTML = '🟢 <b style="color:#4fc3f7;">田忌胜！</b>';
+                st.innerHTML = '🟢 <b style="color:#4fc3f7;">齐王胜！</b>';
                 ourWins++; ourH.style.fontSize = '3.2rem';
               } else {
-                st.innerHTML = '🔴 <b style="color:#ef9a9a;">齐王胜...</b>';
+                st.innerHTML = '🔴 <b style="color:#ef9a9a;">田忌胜...</b>';
                 theirWins++; theirH.style.fontSize = '3.2rem';
               }
               roundResults.push({ round:i+1, ours:ours.name, theirs:theirs.name, ourWin:ourWin, draw:isDraw });
@@ -575,7 +579,7 @@
         return '<div class="result-chip '+cls+' fade-in">第'+r.round+'场: '+r.ours+' vs '+r.theirs+' → '+sym+'</div>';
       });
       var finalCls = (ourWins>theirWins) ? 'win' : (ourWins===theirWins ? 'draw' : 'lose');
-      var finalMsg = (ourWins>theirWins) ? '🎉 田忌'+ourWins+':'+theirWins+' 获胜！' : (ourWins===theirWins ? '🤝 田忌'+ourWins+':'+theirWins+' 平局' : '💔 田忌'+ourWins+':'+theirWins+' 失败');
+      var finalMsg = (ourWins>theirWins) ? '🎉 齐威王'+ourWins+':'+theirWins+' 获胜！' : (ourWins===theirWins ? '🤝 齐威王'+ourWins+':'+theirWins+' 平局' : '💔 齐威王'+ourWins+':'+theirWins+' 失败');
       arena.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;flex:1;padding:8px;">'+
         nr.join('') + '<div class="result-chip '+finalCls+' fade-in" style="font-size:0.95rem;">'+finalMsg+'</div>'+
         '<div style="color:rgba(255,255,255,0.3);font-size:0.7rem;margin-top:4px;">点击「重来」再战</div></div>';
